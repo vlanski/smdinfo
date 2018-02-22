@@ -1,7 +1,7 @@
 # SMDInfo
 **SMDInfo** is a small program with TkInter GUI for viewing SMD files properties.
 
-SMD - StudioMDL Data that stores 3D models in ASCII for Valve Source Engine.
+**SMD** - StudioMDL Data that stores 3D models in ASCII for Valve Source Engine.
 
 ![Screenshot](https://raw.githubusercontent.com/vlanski/smdinfo/master/screenshot.png "")
 

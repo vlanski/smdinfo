@@ -15,6 +15,7 @@ import os.path
 import sys
 
 
+__author__ = 'vlanski'
 __version__ = '0.1'
 
 

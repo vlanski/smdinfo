@@ -1,4 +1,6 @@
 ﻿#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
+
 
 """
 SMDInfo
@@ -7,16 +9,23 @@ SMD - StudioMDL Data, stores 3D models in ASCII for Valve Source Engine.
 """
 
 
-import Tkinter
-import ttk
-import tkMessageBox
-import tkFileDialog
+__author__ = 'vlanski'
+__version__ = '0.1'
+
+
 import os.path
 import sys
 
-
-__author__ = 'vlanski'
-__version__ = '0.1'
+try: # Python 3
+    import tkinter as Tkinter
+    import tkinter.ttk as ttk
+    import tkinter.messagebox as tkMessageBox
+    import tkinter.filedialog as tkFileDialog
+except: # Python 2
+    import Tkinter
+    import ttk
+    import tkMessageBox
+    import tkFileDialog
 
 
 # - Information ----------------------------------------------------------------
@@ -634,7 +643,8 @@ def init_controls():
 
     # - Icons ------------------------------------------------------------------
     icons = {}
-    for icon_name, icon_base64 in ICONS_BASE64.iteritems():
+
+    for icon_name, icon_base64 in ICONS_BASE64.items():
         icons[icon_name] = Tkinter.PhotoImage(data=icon_base64)
 
     # Main form icon

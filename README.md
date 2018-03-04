@@ -6,7 +6,7 @@
 ![Screenshot](https://raw.githubusercontent.com/vlanski/smdinfo/master/screenshot.png "")
 
 ## Requirements
-* Python 2.7;
+* Python >= 2.7;
 * TkInter.
 
 ## References

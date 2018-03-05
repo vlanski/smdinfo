@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 
 """
@@ -16,16 +16,20 @@ __version__ = '0.1'
 import os.path
 import sys
 
-try: # Python 3
+
+# - Python 3 Tk ----------------------------------------------------------------
+try:
     import tkinter as Tkinter
     import tkinter.ttk as ttk
     import tkinter.messagebox as tkMessageBox
     import tkinter.filedialog as tkFileDialog
-except: # Python 2
+# - Python 2 Tk ----------------------------------------------------------------
+except:
     import Tkinter
     import ttk
     import tkMessageBox
     import tkFileDialog
+# ------------------------------------------------------------------------------
 
 
 # - Information ----------------------------------------------------------------
@@ -573,7 +577,7 @@ def cmd_delete(*args):
 
 def cmd_about(*args):
     ''' Help -> About '''
-    tkMessageBox.showinfo('Delete', INFO_LICENSE)
+    tkMessageBox.showinfo('About SMDInfo', INFO_LICENSE)
 # ------------------------------------------------------------------------------
 
 

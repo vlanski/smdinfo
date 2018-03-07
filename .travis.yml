@@ -8,4 +8,4 @@ before_install:
     - sudo apt-get install python-tk
     
 script:
-  - python smdinfo.smd
+  - python smdinfo.py

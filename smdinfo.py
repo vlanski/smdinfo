@@ -6,6 +6,16 @@
 SMDInfo
 Small program with TkInter GUI for viewing SMD files properties.
 SMD - StudioMDL Data, stores 3D models in ASCII for Valve Source Engine.
+
+
+Requirements:
+* Python >= 2.7;
+* TkInter;
+* TkDnD Binaries (optional);      https://sourceforge.net/projects/tkdnd/
+* TkDnD Python Lib (optional).    http://tkinterdnd.sourceforge.net/
+
+
+Icons by FatCow.
 """
 
 
@@ -17,14 +27,23 @@ import os.path
 import sys
 
 
+IS_PYTHON3 = sys.version_info[0] >= 3
+IS_WINDOWS = sys.platform.startswith('win')
+
+
+# - For Not Windows OS ---------------------------------------------------------
+WIN_CODEPAGE = 'cp1252'
+# ------------------------------------------------------------------------------
+
+
 # - Python 3 Tk ----------------------------------------------------------------
-try:
+if IS_PYTHON3:
     import tkinter as Tkinter
     import tkinter.ttk as ttk
     import tkinter.messagebox as tkMessageBox
     import tkinter.filedialog as tkFileDialog
 # - Python 2 Tk ----------------------------------------------------------------
-except:
+else:
     import Tkinter
     import ttk
     import tkMessageBox
@@ -32,12 +51,29 @@ except:
 # ------------------------------------------------------------------------------
 
 
-# - Information ----------------------------------------------------------------
-INFO_LICENSE = \
-'SMDInfo ' + __version__ + '\n\n'                        + \
-'Created by vlanski (https://github.com/vlanski)\n'      + \
-'Icons by FatCow (http://www.fatcow.com/free-icons)\n\n' + \
-'SMDInfo is released under MIT License'
+# - TKinter DragAndDrop Module -------------------------------------------------
+try:
+    from TkinterDnD2 import *
+    tk_dnd_enabled = True
+except:
+    tk_dnd_enabled = False
+# ------------------------------------------------------------------------------
+
+
+# - Range Replacement ----------------------------------------------------------
+if not IS_PYTHON3:
+    range = xrange
+# ------------------------------------------------------------------------------
+
+
+# - About Information ----------------------------------------------------------
+ABOUT_INFORMATION = '''\
+SMDInfo v''' + __version__ + '''
+
+Created by vlanski (https://github.com/vlanski)
+Icons by FatCow (http://www.fatcow.com/free-icons)
+
+SMDInfo is released under MIT License.'''
 # ------------------------------------------------------------------------------
 
 
@@ -90,6 +126,11 @@ ICONS_BASE64 = {
         'zs8GDFMBSdXVStjZSklHUwwcUuHi41Is3Uc2Terr7E0d50RR8vP0UTLdBDdP+/z9Tx' + \
         'sEphDwAKWgwYNQdASE8MKJw4cQnQCBMGVJDyYYM2pk8uPQkiUJEjgQICACSQctEnxU' + \
         'xLIlokAAOw==',
+'cls':  'R0lGODlhEAAQAMQXAPBdRu5ZQfiHdvqCcfluWeVJLfx+bPW7sPWzp/eMe/bDuvSrnv' + \
+        'Wjl/aRgvWdj/aWiOpRN/NhS/dpVPVlT+dNMuxVPMRAMP///wAAAAAAAAAAAAAAAAAA' + \
+        'AAAAAAAAAAAAACH5BAEAABcALAAAAAAQABAAAAVe4CValmhe5IkqSmlarIseRXG4Fm' + \
+        '3jCOUjpN5PZllAjgsjUjZiVJ5QBvPlCFgDjunrAegCHlpUI0IuN6aWxGSdULOJAolc' + \
+        'QIrPcQMCYYDX818GBkwWgWhaKSqJiouLIQA7',
 'quit': 'R0lGODlhEAAQAPePALCDSlVVV1FSU0pKTFhZW1xdX2BhYkRGSDg9Q05OT2NkZltbWm' + \
         'lqbF9hYmJkZz1CSlpcX6x+SK+CSrGET9O1lbKFTldZW+/awGJnbklPVWhqbUZKUE9R' + \
         'U1thaPLbwcaUWLuKT82bX+vTuEVLUuvVuZt0R7yOWPXauap9R/e5IsKQVDY7QqyATF' + \
@@ -119,39 +160,6 @@ ICONS_BASE64 = {
         'BPwMtMmTteh9TiSbi3DwGpDD9UjwtUFk2GURQKpgHhBUZbPFJhAAAmhRF+NmZcA2EH' + \
         'BQwMBQd+HDFQImEJOZ05CX40L3w8O1YKOQsLOQp+MxYAiTtOULUlGyeUpQY4BDpEGi' + \
         '4eKxUOn6VUPQM8IBUpxq06yTC1tTjJvL6/OgQ4BsngS0EAOw==',
-'del':  'R0lGODlhEAAQAOZWAAB7ugB7tgB5tQB1uABztAB1tT83M6vq/2fC49jb2wB6tvr///' + \
-        '7//wB3tUM4M/j//wB6tgB7u3Z4eQB9uAB4tllWWGXC5AB0t42CewB2ud/Y1QB6tff/' + \
-        '/5SVl4SEhIOCgen//7WqouX6/6nl/6Pe9QB4t+T5//H8//z//5XV8AB7tvT19mvG5z' + \
-        '81MD42MAB9u7S/yD41MP///+f6/3/D5JXa90E2MEQ5M/Hv7t7X06bf9mHB5aff9oKC' + \
-        'gl7C6IqKioaGhmXG7AB8twB9twB6tej6/7a/x0A3M6bk/oKBfwB9uOH6/wB+unHE5u' + \
-        'v9/wB1tebXzdLs+IiIiHd2d4TN7Z7O5AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
-        'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
-        'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
-        'ACH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZW' + \
-        'hpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczpt' + \
-        'ZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxMzIgNzkuMTU5Mjg0LC' + \
-        'AyMDE2LzA0LzE5LTEzOjEzOjQwICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9' + \
-        'Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cm' + \
-        'RmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5h' + \
-        'ZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY2' + \
-        '9tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94' + \
-        'YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZS' + \
-        'BQaG90b3Nob3AgQ0MgMjAxNS41IChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0i' + \
-        'eG1wLmlpZDpGRTc3RTRBMzE3NDYxMUU4QjcwMEY2NTU3NkJDRjU3MSIgeG1wTU06RG' + \
-        '9jdW1lbnRJRD0ieG1wLmRpZDpGRTc3RTRBNDE3NDYxMUU4QjcwMEY2NTU3NkJDRjU3' + \
-        'MSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOk' + \
-        'ZFNzdFNEExMTc0NjExRThCNzAwRjY1NTc2QkNGNTcxIiBzdFJlZjpkb2N1bWVudElE' + \
-        'PSJ4bXAuZGlkOkZFNzdFNEEyMTc0NjExRThCNzAwRjY1NTc2QkNGNTcxIi8+IDwvcm' + \
-        'RmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQg' + \
-        'ZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2d' + \
-        'jX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqain' + \
-        'pqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dn' + \
-        'V0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVE' + \
-        'Q0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUEx' + \
-        'IREA8ODQwLCgkIBwYFBAMCAQAAIfkEAQAAVgAsAAAAABAAEAAAB3uAVoKDhCoCKoSJ' + \
-        'gyUoJxwNioQACz47TQxCkVYADzEtVVQpiIoQIi4dUzY1PEOKFE5BRxIVNyOjhAJFFh' + \
-        'k5Bg4HTIpKMwhPRhcgSC+RACxPUAQmJBCaIQMwBFE0RJofMhoDSzrcmj0JOBgRSpqC' + \
-        'HitJ7IRSQPGEP/X4ioEAOw==',
 'info': 'R0lGODlhEAAQAOZCAEN2pvL5/X6jxebx+ISnxj5ypDtwolyJs4mpyV2JtD1xo46syo' + \
         'eoyD5yo4uqyer0+oyryoGkxH+kxISmxzxwou/3/P7//0l6qfz//9/t9oGlxV+Ks2CM' + \
         'tebz+4aoxkJ0pe/4/eDv+EF0pXSavmONtT1yo2aQuGuUunmewUV3p2KMtmmSuUR3p2' + \
@@ -196,32 +204,35 @@ ICONS_BASE64 = {
               'QJ1wqMMJcMTkEAcgAZBK4m1BWNyiRJzDgbpihbFCp+D56kAwQIsDYFiUtwYB' + \
               'scnlJpmTiqj4PEIGBgkJFRQHUEsCJiUydgByAVgrGhEMNQWRURIPFxgHAy5Y' + \
               'IzMDkSw2L1gCNApDAykCUTgIXjoQIrVJmUtmZkEAOw==',
-'bones': 'R0lGODlhEAAQAMQSADA4PzdASDpDS0RPVykxNkFLUiYsMhgcICMoLjQ8Qy40OyAkK' + \
-         'RUYGxsgJT5HTwoMD0RPWS83PgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
-         'AAAAAAAAAAAAAAACH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGl' + \
-         'kPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4' + \
-         'PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxM' + \
-         'zIgNzkuMTU5Mjg0LCAyMDE2LzA0LzE5LTEzOjEzOjQwICAgICAgICAiPiA8cmRmOl' + \
-         'JERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN' + \
-         '5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4' + \
-         'bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJod' + \
-         'HRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cD' + \
-         'ovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkN' + \
-         'yZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNS41IChXaW5kb3dzKSIg' + \
-         'eG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo3ODg4OTk5QjE1QTgxMUU4QkY3NkMyR' + \
-         'kMyM0MyNDZBQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo3ODg4OTk5QzE1QT' + \
-         'gxMUU4QkY3NkMyRkMyM0MyNDZBQyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjp' + \
-         'pbnN0YW5jZUlEPSJ4bXAuaWlkOjc4ODg5OTk5MTVBODExRThCRjc2QzJGQzIzQzI0' + \
-         'NkFDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjc4ODg5OTlBMTVBODExRThCR' + \
-         'jc2QzJGQzIzQzI0NkFDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+ID' + \
-         'wveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fD' + \
-         'v7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/' + \
-         'vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPj' + \
-         'o2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl' + \
-         '1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0' + \
-         'sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkE' + \
-         'AQAAEgAsAAAAABAAEAAABUGgJI7SAA1kOharmjoj7I4CLdWzFOxikIuJUVAVARiPR' + \
-         'pditPwRRs+fYTT9jRAPhFW0kHS3DUl4e5CUtwxJepsLAQA7',
+'bones': 'R0lGODlhEAAQANUlAGNjY/39/b+/v9XV1fn5+ezs7NjY2Onp6fj4+Ly8vPT09N/f3' + \
+         '9zc3OLi4t7e3urq6ubm5rq6uuDg4LCwsOvr68LCwvX19dDQ0KmpqY+Pj7e3t8zMzN' + \
+         'vb2/r6+u/v74aGhs3Nzfb29uPj49nZ2cTExAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
+         'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' + \
+         'AAAAAAAAAAAAACH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkP' + \
+         'SJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PS' + \
+         'JhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxMzI' + \
+         'gNzkuMTU5Mjg0LCAyMDE2LzA0LzE5LTEzOjEzOjQwICAgICAgICAiPiA8cmRmOlJE' + \
+         'RiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5b' + \
+         'nRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bX' + \
+         'A9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHR' + \
+         'wOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDov' + \
+         'L25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZ' + \
+         'WF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNS41IChXaW5kb3dzKSIgeG' + \
+         '1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpBQUYwMUVGMjQxOUUxMUU4ODlBNDlCNjZ' + \
+         'DMzIwMEMzMyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpBQUYwMUVGMzQxOUUx' + \
+         'MUU4ODlBNDlCNjZDMzIwMEMzMyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppb' + \
+         'nN0YW5jZUlEPSJ4bXAuaWlkOkFBRjAxRUYwNDE5RTExRTg4OUE0OUI2NkMzMjAwQz' + \
+         'MzIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkFBRjAxRUYxNDE5RTExRTg4OUE' + \
+         '0OUI2NkMzMjAwQzMzIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwv' + \
+         'eDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7' + \
+         'u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr' + \
+         '28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2' + \
+         'Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1c' + \
+         'W1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sK' + \
+         'yopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkEAQ' + \
+         'AAJQAsAAAAABAAEAAABmzAknAoBBiJyCFAEXgAkkhAoGN5QpWIkGdwhAIECMWBqbE' + \
+         'Sv4QHhCNxCMxFAYHSMDhIg4zViD4sGG98RQkBCAQNDCMJcEUBEAcFBhcRjEUiCwYD' + \
+         'IJRXJUYDBRsTlVEBBRWkZxgJH6lnXZ2xREEAOw==',
 'mats': 'R0lGODlhEAAQAOZOAD636zO27Du36zi360C469bw/za27Lfq/9jx/5nc/8nr/8/u/4' + \
         'XT/4HR/53e/6Dg/7bp/8vs/6ni//b7//j8/4vV/3nP/3HL/9Pv/8zt/4/X/93z/9Xv' + \
         '/5Pa/8Do/5La/9Lu/8Dn/9Tv/9Du/zm27IjU/8rr/2vJ/3PN/37Q/73r//f8/8Hr//' + \
@@ -407,14 +418,32 @@ class SMDReader():
         with open(file_name, 'r') as smd_file:
             for smd_str in smd_file:
                 smd_str = smd_str.strip().replace('\t', ' ')
-                smd_str_wo_com = smd_str
 
                 # - Parse Comments ---------------------------------------------
-                comment_ind = smd_str.find('//')
-                if comment_ind == -1:
-                    comment_ind = smd_str.find('#')
-                if comment_ind == -1:
-                    comment_ind = smd_str.find(';')
+                smd_str_wo_com = smd_str
+
+                is_string = False
+                comment_ind = -1
+
+                # - If Comment Chars In String ---------------------------------
+                if '"' in smd_str:
+                    for i in range(0, len(smd_str)):
+                        ch = smd_str[i]
+                        if ch == '"':
+                            is_string = not is_string
+                        elif ch == '\\' and not is_string:
+                            pass
+                        elif ch in ['#', ';'] and not is_string:
+                            comment_ind = i
+                # --------------------------------------------------------------
+
+                # - Without Strings --------------------------------------------
+                else:
+                    comment_ind = smd_str.find('//')
+                    if comment_ind == -1:
+                        comment_ind = smd_str.find('#')
+                    if comment_ind == -1:
+                        comment_ind = smd_str.find(';')
 
                 if comment_ind != -1:
                     smd_str = smd_str[0:comment_ind]
@@ -443,8 +472,8 @@ class SMDReader():
                     if smd_str.lower() == 'end':
                         current_section = -1
                     else:
-                        start_bone_name = smd_str.find(' ')
-                        end_bone_name = smd_str.rfind(' ')
+                        start_bone_name = smd_str.index(' ')
+                        end_bone_name = smd_str.rindex(' ')
 
                         bone_id = int(smd_str[0:start_bone_name])
                         bone_name = smd_str[start_bone_name+1:
@@ -514,7 +543,7 @@ class SMDReader():
         count = min(len(s1), len(s2))
 
         s = ''
-        for i in xrange(0, count):
+        for i in range(0, count):
             if s1[i] == s2[i]:
                 s += s1[i]
 
@@ -522,6 +551,21 @@ class SMDReader():
     # --------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
+
+# - System Windows Codepage Conversion -----------------------------------------
+def smd_codepage(data):
+    ''' Dirty hacks for Tk to convert strings in system codepage '''
+    if IS_WINDOWS:
+        codepage2 = 'mbcs'
+        codepage3 = 'utf-8'
+    else:
+        codepage2 = codepage3 = WIN_CODEPAGE
+
+    if not IS_PYTHON3:
+        return data.decode(codepage2)
+    else:
+        return bytes(data, 'utf-8').decode(codepage3)
+# ------------------------------------------------------------------------------
 
 # - Menu Commands --------------------------------------------------------------
 def cmd_open_smd_file(*args):
@@ -546,16 +590,15 @@ def cmd_copy(*args):
     main_form.clipboard_append(smd_tree.item(smd_tree.selection())['text'])
 
 
-def cmd_delete(*args):
-    ''' Edit -> Delete '''
+def cmd_close(*args):
+    ''' File -> Close '''
     curr_element = smd_tree.selection()
     while smd_tree.parent(curr_element) != '':
         curr_element = smd_tree.parent(curr_element)
 
-    if tkMessageBox.askyesno('Delete', 'Do you want to delete "'
-                                       + smd_tree.item(curr_element)['text']
-                                       + '"'):
-
+    if tkMessageBox.askyesno('Close File', 'Do you want to close "'
+                                           + smd_tree.item(curr_element)['text']
+                                           + '"'):
 
         # - Finding Element For Selection --------------------------------------
         if smd_tree.prev(curr_element) != '':
@@ -577,7 +620,7 @@ def cmd_delete(*args):
 
 def cmd_about(*args):
     ''' Help -> About '''
-    tkMessageBox.showinfo('About SMDInfo', INFO_LICENSE)
+    tkMessageBox.showinfo('About SMDInfo', ABOUT_INFORMATION)
 # ------------------------------------------------------------------------------
 
 
@@ -602,6 +645,9 @@ def smd_tree_select(event):
         curr_element = smd_tree.parent(curr_element)
 
     status_bar['text'] = path
+
+    path.startswith('<Empty SMD>')
+
 # ------------------------------------------------------------------------------
 
 
@@ -619,7 +665,18 @@ def smd_tree_popup_menu(event):
 # ------------------------------------------------------------------------------
 
 
-# - GUI procedures -------------------------------------------------------------
+# - Drop Files -----------------------------------------------------------------
+def cmd_file_drop(event):
+    file_names = main_form.tk.splitlist(event.data)
+    for file_name in file_names:
+        if IS_PYTHON3:
+            load_smd(file_name)
+        else:
+            load_smd(file_name.decode('utf-8'))
+# ------------------------------------------------------------------------------
+
+
+# - GUI Procedures -------------------------------------------------------------
 def init_controls():
     # - Globals ----------------------------------------------------------------
     global main_form
@@ -629,8 +686,12 @@ def init_controls():
     # --------------------------------------------------------------------------
 
     # - Main Form --------------------------------------------------------------
-    main_form = Tkinter.Tk()
-    main_form.title('SMDInfo')
+    if tk_dnd_enabled:
+        main_form = TkinterDnD.Tk()
+    else:
+        main_form = Tkinter.Tk()
+
+    main_form.title('SMDInfo v' + __version__)
     main_form.minsize(400, 280)
     main_form.geometry('400x300+' +
                        str((main_form.winfo_screenwidth()  - 400) // 2) + '+' +
@@ -640,7 +701,7 @@ def init_controls():
     # - Hotkeys ----------------------------------------------------------------
     main_form.bind_all('<Control-Key-o>', cmd_open_smd_file)
     main_form.bind_all('<Control-Key-c>', cmd_copy)
-    main_form.bind_all('<Delete>',        cmd_delete)
+    main_form.bind_all('<Delete>',        cmd_close)
     main_form.bind_all('<F1>',            cmd_about)
     main_form.bind_all('<Alt-F4>',        cmd_quit)
     # --------------------------------------------------------------------------
@@ -683,15 +744,21 @@ def init_controls():
     smd_tree.bind('<Button-3>', smd_tree_popup_menu)
     # --------------------------------------------------------------------------
 
+    # - DragAndDrop Events -----------------------------------------------------
+    if tk_dnd_enabled:
+        main_form.drop_target_register(1, DND_FILES)
+        main_form.dnd_bind('<<Drop>>', cmd_file_drop)
+    # --------------------------------------------------------------------------
+
 
 def init_menu():
     # - Main Menu --------------------------------------------------------------
+    global main_menu
     main_menu = Tkinter.Menu(main_form)
     main_form.config(menu=main_menu)
     # --------------------------------------------------------------------------
 
     # - Popup Menu -------------------------------------------------------------
-    global smd_tree_menu
     smd_tree_menu =  Tkinter.Menu(main_form, tearoff=0)
     # --------------------------------------------------------------------------
 
@@ -702,10 +769,15 @@ def init_menu():
     # --------------------------------------------------------------------------
 
     # - File Submenu -----------------------------------------------------------
-    file_menu.add_command(label='Open SMD File...',
+    file_menu.add_command(label='Open...',
                           accelerator='Ctrl+O',
                           command=cmd_open_smd_file,
                           image=icons['open'],
+                          compound=Tkinter.LEFT)
+    file_menu.add_command(label='Close...',
+                          accelerator='Delete',
+                          command=cmd_close,
+                          image=icons['cls'],
                           compound=Tkinter.LEFT)
     file_menu.add_separator()
     file_menu.add_command(label='Quit',
@@ -720,12 +792,6 @@ def init_menu():
                           accelerator='Ctrl+C',
                           command=cmd_copy,
                           image=icons['copy'],
-                          compound=Tkinter.LEFT)
-    edit_menu.add_separator()
-    edit_menu.add_command(label='Delete...',
-                          accelerator='Delete',
-                          command=cmd_delete,
-                          image=icons['del'],
                           compound=Tkinter.LEFT)
     # --------------------------------------------------------------------------
 
@@ -750,10 +816,10 @@ def init_menu():
                           image=icons['copy'],
                           compound=Tkinter.LEFT)
     smd_tree_menu.add_separator()
-    smd_tree_menu.add_command(label='Delete...',
+    smd_tree_menu.add_command(label='Close...',
                           accelerator='Delete',
-                          command=cmd_delete,
-                          image=icons['del'],
+                          command=cmd_close,
+                          image=icons['cls'],
                           compound=Tkinter.LEFT)
     # --------------------------------------------------------------------------
 
@@ -800,7 +866,13 @@ def init_tree():
 def load_smd(file_name):
     if os.path.isfile(file_name):
         # - Load SMD File ------------------------------------------------------
-        smd_data = SMDReader(file_name)
+        try:
+            smd_data = SMDReader(file_name)
+        except Exception as ex:
+            tkMessageBox.showerror('Open SMD File',
+                                   'Error while reading file:\n' + file_name)
+            return
+
         base_name = os.path.basename(file_name)
         # ----------------------------------------------------------------------
 
@@ -872,6 +944,8 @@ def load_smd(file_name):
             bones_tree = [(bone_id, None) for bone_id, _, _ in smd_data.bones]
 
             for bone_id, parent_id, bone_name in smd_data.bones:
+                bone_name = smd_codepage(bone_name)
+
                 if parent_id == -1:
                     bones_tree[bone_id] = smd_tree.insert(smd_tree_bones_root,
                                                           'end',
@@ -895,7 +969,7 @@ def load_smd(file_name):
                 material = os.path.splitext(material)
                 smd_tree.insert(smd_tree_materials,
                                 'end',
-                                text=material[0],
+                                text=smd_codepage(material[0]),
                                 image=icons['mat'])
         else:
             smd_tree.insert(smd_tree_materials,
@@ -911,7 +985,7 @@ def load_smd(file_name):
                 lr_suffix = ' (L + R)' if flex_dual else ''
                 smd_tree.insert(smd_tree_flexes,
                                 'end',
-                                text=flex_name + lr_suffix,
+                                text=smd_codepage(flex_name) + lr_suffix,
                                 image=icons['flex'],
                                 values=(flex_name,))
         else:

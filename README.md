@@ -7,7 +7,11 @@
 
 ## Requirements
 * Python >= 2.7;
-* TkInter.
+* TkInter;
+* [TkDnD Binaries (optional)](https://sourceforge.net/projects/tkdnd/);
+* [TkDnD Python Lib (optional)](http://tkinterdnd.sourceforge.net/).
+
+*TkDnD Binaries and TkDnD Python Lib are required for Drag&Drop actions.*
 
 ## References
 * [Description of SMD format](https://developer.valvesoftware.com/wiki/Studiomdl_Data "");
